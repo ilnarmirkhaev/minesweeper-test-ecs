@@ -28,12 +28,14 @@ namespace Infrastructure
             builder.RegisterSystem<FieldCreationSystem>();
             builder.RegisterSystem<MineDistributionSystem>();
             builder.RegisterSystem<FieldInitializationSystem>();
+            builder.RegisterSystem<DebugFieldLogSystem>();
         }
 
         private void RegisterPools(IContainerBuilder builder)
         {
             builder.RegisterPool<CellComponent>();
             builder.RegisterPool<MineComponent>();
+            builder.RegisterPool<NeighborMinesCount>();
         }
     }
 }

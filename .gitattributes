@@ -1,2 +1,2 @@
-# Ignore all differences in line endings
-*        -crlf
+# Normalize line endings to LF (Mac + Windows)
+* text=auto eol=lf

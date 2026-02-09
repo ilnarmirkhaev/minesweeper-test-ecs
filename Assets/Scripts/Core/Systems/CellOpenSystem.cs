@@ -10,29 +10,24 @@ namespace Core.Systems
     public sealed class CellOpenSystem : IEcsRunSystem
     {
         private readonly ICellLookup _lookup;
-        private readonly GameSessionState _session;
 
         private readonly EcsPool<CellComponent> _cellPool;
         private readonly EcsPool<MineComponent> _minePool;
         private readonly EcsPool<NeighborMinesCount> _neighborPool;
         private readonly EcsPool<Opened> _openedPool;
-        private readonly EcsPool<Flagged> _flaggedPool;
         private readonly EcsPool<Exploded> _explodedPool;
         private readonly EcsPool<Dirty> _dirtyPool;
-        private readonly EcsPool<OpenCellRequest> _requestPool;
+        private readonly EcsPool<OpenCellCommand> _requestPool;
 
-        public CellOpenSystem(ICellLookup lookup, GameSessionState session, EcsPool<CellComponent> cellPool,
-            EcsPool<MineComponent> minePool, EcsPool<NeighborMinesCount> neighborPool, EcsPool<Opened> openedPool,
-            EcsPool<Flagged> flaggedPool, EcsPool<Exploded> explodedPool, EcsPool<Dirty> dirtyPool,
-            EcsPool<OpenCellRequest> requestPool)
+        public CellOpenSystem(ICellLookup lookup, EcsPool<CellComponent> cellPool, EcsPool<MineComponent> minePool,
+            EcsPool<NeighborMinesCount> neighborPool, EcsPool<Opened> openedPool, EcsPool<Exploded> explodedPool,
+            EcsPool<Dirty> dirtyPool, EcsPool<OpenCellCommand> requestPool)
         {
             _lookup = lookup;
-            _session = session;
             _cellPool = cellPool;
             _minePool = minePool;
             _neighborPool = neighborPool;
             _openedPool = openedPool;
-            _flaggedPool = flaggedPool;
             _explodedPool = explodedPool;
             _dirtyPool = dirtyPool;
             _requestPool = requestPool;
@@ -41,28 +36,14 @@ namespace Core.Systems
         public void Run(IEcsSystems systems)
         {
             var world = systems.GetWorld();
-            var filter = world.Filter<OpenCellRequest>().End();
+            var filter = world.Filter<OpenCellCommand>().End();
 
-            foreach (var reqEntity in filter)
+            foreach (var e in filter)
             {
-                ref var req = ref _requestPool.Get(reqEntity);
-                Handle(req.Position);
-                world.DelEntity(reqEntity);
+                ref var command = ref _requestPool.Get(e);
+                OpenCell(command.CellEntity);
+                world.DelEntity(e);
             }
-        }
-
-        private void Handle(Vector2Int position)
-        {
-            if (_session.IsGameOver)
-                return;
-
-            if (!_lookup.TryGetCellEntity(position, out var cellEntity))
-                return;
-
-            if (_flaggedPool.Has(cellEntity) || _openedPool.Has(cellEntity))
-                return;
-
-            OpenCell(cellEntity);
         }
 
         private void OpenCell(int cellEntity)
@@ -84,10 +65,7 @@ namespace Core.Systems
             while (queue.Count > 0)
             {
                 var e = queue.Dequeue();
-                if (_openedPool.Has(e) || _flaggedPool.Has(e))
-                    continue;
-                if (_minePool.Has(e))
-                    continue;
+                if (_openedPool.Has(e) || _minePool.Has(e)) continue;
 
                 MarkCellOpened(e);
 
@@ -106,10 +84,7 @@ namespace Core.Systems
                 var pos = cellPosition + offset;
                 if (!_lookup.TryGetCellEntity(pos, out var neighborEntity))
                     continue;
-                if (_openedPool.Has(neighborEntity) || _flaggedPool.Has(neighborEntity))
-                    continue;
-                if (_minePool.Has(neighborEntity))
-                    continue;
+                if (_openedPool.Has(neighborEntity) || _minePool.Has(neighborEntity)) continue;
 
                 queue.Enqueue(neighborEntity);
             }
@@ -130,8 +105,8 @@ namespace Core.Systems
 
         private void MarkDirty(int entity)
         {
-            if (!_dirtyPool.Has(entity))
-                _dirtyPool.Add(entity);
+            if (_dirtyPool.Has(entity)) return;
+            _dirtyPool.Add(entity);
         }
     }
 }

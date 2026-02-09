@@ -38,6 +38,7 @@ namespace Infrastructure
         {
             // input systems
             builder.RegisterSystem<RestartInputSystem>();
+            builder.RegisterSystem<CellClickSystem>();
 
             // init systems
             builder.RegisterSystem<FieldCreationSystem>();
@@ -66,7 +67,8 @@ namespace Infrastructure
             builder.RegisterPool<Dirty>();
 
             builder.RegisterPool<FirstCellClickedEvent>();
-            builder.RegisterPool<OpenCellRequest>();
+            builder.RegisterPool<ClickCellRequest>();
+            builder.RegisterPool<OpenCellCommand>();
             builder.RegisterPool<ToggleFlagRequest>();
             builder.RegisterPool<RestartRequest>();
             builder.RegisterPool<GameResetListenerBind>();

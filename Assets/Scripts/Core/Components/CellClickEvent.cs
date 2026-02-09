@@ -8,9 +8,14 @@ namespace Core.Components
         Right = 1
     }
 
-    public struct OpenCellRequest
+    public struct ClickCellRequest
     {
         public Vector2Int Position;
+    }
+
+    public struct OpenCellCommand
+    {
+        public int CellEntity;
     }
 
     public struct ToggleFlagRequest
@@ -18,4 +23,3 @@ namespace Core.Components
         public Vector2Int Position;
     }
 }
-

@@ -9,20 +9,18 @@ namespace Core.Systems
     public class MineDistributionSystem : IEcsRunSystem
     {
         private readonly MineFieldConfig _config;
-        private readonly EcsPool<CellComponent> _cellPool;
         private readonly EcsPool<MineComponent> _minePool;
-        private readonly EcsPool<FirstCellClickedEvent> _firstCellEventPool;
+        private readonly EcsPool<FirstCellClickedEvent> _firstClickPool;
 
         private EcsFilter _closedCellsFilter;
         private EcsFilter _firstCellClickedFilter;
 
-        public MineDistributionSystem(MineFieldConfig config, EcsPool<CellComponent> cellPool,
-            EcsPool<MineComponent> minePool, EcsPool<FirstCellClickedEvent> firstCellEventPool)
+        public MineDistributionSystem(MineFieldConfig config, EcsPool<MineComponent> minePool,
+            EcsPool<FirstCellClickedEvent> firstClickPool)
         {
             _config = config;
-            _cellPool = cellPool;
             _minePool = minePool;
-            _firstCellEventPool = firstCellEventPool;
+            _firstClickPool = firstClickPool;
         }
 
         public void Run(IEcsSystems systems)
@@ -39,15 +37,15 @@ namespace Core.Systems
         {
             var candidates = new List<int>(_config.TotalCells);
 
-            var firstCellPosition =  new Vector2Int(-1, -1);
+            var firstCell = -1;
             foreach (var entity in _firstCellClickedFilter)
             {
-                firstCellPosition = _firstCellEventPool.Get(entity).Position;
+                firstCell = _firstClickPool.Get(entity).CellEntity;
             }
 
             foreach (var entity in _closedCellsFilter)
             {
-                if (_cellPool.Get(entity).Position == firstCellPosition) continue;
+                if (entity == firstCell) continue;
                 candidates.Add(entity);
             }
 

@@ -45,7 +45,9 @@ namespace Infrastructure
             builder.RegisterSystem<GameResetSystem>();
             builder.RegisterSystem<MineDistributionSystem>();
             builder.RegisterSystem<NeighborMinesCountSystem>();
+#if UNITY_EDITOR
             builder.RegisterSystem<DebugFieldLogSystem>();
+#endif
             builder.RegisterSystem<GameStartCleanupSystem>();
 
             // game loop systems

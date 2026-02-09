@@ -18,10 +18,11 @@ namespace Core.Systems
         private readonly EcsPool<Exploded> _explodedPool;
         private readonly EcsPool<Dirty> _dirtyPool;
         private readonly EcsPool<OpenCellCommand> _requestPool;
+        private readonly EcsPool<Flagged> _flagPool;
 
         public CellOpenSystem(ICellLookup lookup, EcsPool<CellComponent> cellPool, EcsPool<MineComponent> minePool,
             EcsPool<NeighborMinesCount> neighborPool, EcsPool<Opened> openedPool, EcsPool<Exploded> explodedPool,
-            EcsPool<Dirty> dirtyPool, EcsPool<OpenCellCommand> requestPool)
+            EcsPool<Dirty> dirtyPool, EcsPool<OpenCellCommand> requestPool, EcsPool<Flagged> flagPool)
         {
             _lookup = lookup;
             _cellPool = cellPool;
@@ -31,6 +32,7 @@ namespace Core.Systems
             _explodedPool = explodedPool;
             _dirtyPool = dirtyPool;
             _requestPool = requestPool;
+            _flagPool = flagPool;
         }
 
         public void Run(IEcsSystems systems)
@@ -94,6 +96,9 @@ namespace Core.Systems
         {
             if (_openedPool.Has(entity)) return;
             _openedPool.Add(entity);
+
+            _flagPool.Del(entity);
+
             MarkDirty(entity);
         }
 

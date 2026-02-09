@@ -10,18 +10,22 @@ namespace Core.Services
         private readonly EcsPool<OpenCellRequest> _openPool;
         private readonly EcsPool<ToggleFlagRequest> _flagPool;
         private readonly EcsPool<RestartRequest> _restartPool;
+        private readonly GameSessionState _session;
 
         public CellInputService(EcsWorld world, EcsPool<OpenCellRequest> openPool, EcsPool<ToggleFlagRequest> flagPool,
-            EcsPool<RestartRequest> restartPool)
+            EcsPool<RestartRequest> restartPool, GameSessionState session)
         {
             _world = world;
             _openPool = openPool;
             _flagPool = flagPool;
             _restartPool = restartPool;
+            _session = session;
         }
 
         public void ClickCell(Vector2Int position, CellClickButton button)
         {
+            if (_session.IsGameOver) return;
+
             var cell = _world.NewEntity();
             if (button == CellClickButton.Left)
             {

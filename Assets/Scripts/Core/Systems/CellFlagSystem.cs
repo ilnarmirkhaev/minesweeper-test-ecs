@@ -13,6 +13,8 @@ namespace Core.Systems
         private readonly EcsPool<Flagged> _flaggedPool;
         private readonly EcsPool<Dirty> _dirtyPool;
         private readonly EcsPool<ToggleFlagRequest> _requestPool;
+        
+        private EcsFilter _requestFilter;
 
         public CellFlagSystem(ICellLookup lookup, GameSessionState session, EcsPool<Opened> openedPool,
             EcsPool<Flagged> flaggedPool, EcsPool<Dirty> dirtyPool, EcsPool<ToggleFlagRequest> requestPool)
@@ -29,9 +31,9 @@ namespace Core.Systems
         {
             if (_session.IsGameOver) return;
 
-            var filter = systems.GetWorld().Filter<ToggleFlagRequest>().End();
+            _requestFilter ??= systems.GetWorld().Filter<ToggleFlagRequest>().End();
 
-            foreach (var reqEntity in filter)
+            foreach (var reqEntity in _requestFilter)
             {
                 ref var req = ref _requestPool.Get(reqEntity);
 

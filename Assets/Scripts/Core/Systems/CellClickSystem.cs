@@ -17,6 +17,8 @@ namespace Core.Systems
         private readonly EcsPool<OpenCellCommand> _openPool;
         private readonly EcsPool<FirstCellClickedEvent> _firstCellPool;
 
+        private EcsFilter _requestFilter;
+
         public CellClickSystem(EcsWorld world, ICellLookup lookup, GameSessionState session, EcsPool<Opened> openedPool,
             EcsPool<Flagged> flaggedPool, EcsPool<ClickCellRequest> requestPool, EcsPool<OpenCellCommand> openPool,
             EcsPool<FirstCellClickedEvent> firstCellPool)
@@ -33,9 +35,9 @@ namespace Core.Systems
 
         public void Run(IEcsSystems systems)
         {
-            var filter = _world.Filter<ClickCellRequest>().End();
+            _requestFilter ??= _world.Filter<ClickCellRequest>().End();
 
-            foreach (var reqEntity in filter)
+            foreach (var reqEntity in _requestFilter)
             {
                 ref var req = ref _requestPool.Get(reqEntity);
                 Handle(req.Position);

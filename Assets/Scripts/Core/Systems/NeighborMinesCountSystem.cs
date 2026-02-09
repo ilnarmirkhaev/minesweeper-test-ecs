@@ -14,6 +14,7 @@ namespace Core.Systems
         private readonly ICellLookup _lookup;
 
         private EcsFilter _filter;
+        private EcsFilter _safeCells;
 
         public NeighborMinesCountSystem(EcsPool<CellComponent> cellPool, EcsPool<MineComponent> minePool,
             EcsPool<NeighborMinesCount> neighborCountPool, ICellLookup lookup)
@@ -29,11 +30,10 @@ namespace Core.Systems
             _filter ??= systems.GetWorld().Filter<FirstCellClickedEvent>().End();
 
             if (_filter.GetEntitiesCount() <= 0) return;
-            
-            var world = systems.GetWorld();
-            var freeCells = world.Filter<CellComponent>().Exc<MineComponent>().End();
 
-            foreach (var entity in freeCells)
+            _safeCells ??= systems.GetWorld().Filter<CellComponent>().Exc<MineComponent>().End();
+
+            foreach (var entity in _safeCells)
             {
                 ref var cell = ref _cellPool.Get(entity);
                 var count = CountNeighborMines(cell.Position);

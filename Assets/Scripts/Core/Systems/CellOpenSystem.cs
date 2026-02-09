@@ -22,6 +22,8 @@ namespace Core.Systems
 
         private readonly Queue<int> _queue = new();
 
+        private EcsFilter _commandFilter;
+
         public CellOpenSystem(ICellLookup lookup, EcsPool<CellComponent> cellPool, EcsPool<MineComponent> minePool,
             EcsPool<NeighborMinesCount> neighborPool, EcsPool<Opened> openedPool, EcsPool<Exploded> explodedPool,
             EcsPool<Dirty> dirtyPool, EcsPool<OpenCellCommand> requestPool, EcsPool<Flagged> flagPool)
@@ -40,9 +42,9 @@ namespace Core.Systems
         public void Run(IEcsSystems systems)
         {
             var world = systems.GetWorld();
-            var filter = world.Filter<OpenCellCommand>().End();
+            _commandFilter ??= world.Filter<OpenCellCommand>().End();
 
-            foreach (var e in filter)
+            foreach (var e in _commandFilter)
             {
                 ref var command = ref _requestPool.Get(e);
                 OpenCell(command.CellEntity);

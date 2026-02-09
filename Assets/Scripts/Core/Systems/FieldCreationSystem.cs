@@ -10,12 +10,15 @@ namespace Core.Systems
         private readonly EcsWorld _world;
         private readonly MineFieldConfig _config;
         private readonly EcsPool<CellComponent> _cellPool;
+        private readonly EcsPool<Dirty> _dirtyPool;
 
-        public FieldCreationSystem(EcsWorld world, MineFieldConfig config, EcsPool<CellComponent> cellPool)
+        public FieldCreationSystem(EcsWorld world, MineFieldConfig config, EcsPool<CellComponent> cellPool,
+            EcsPool<Dirty> dirtyPool)
         {
             _world = world;
             _config = config;
             _cellPool = cellPool;
+            _dirtyPool = dirtyPool;
         }
 
         public void Init(IEcsSystems systems)
@@ -35,6 +38,8 @@ namespace Core.Systems
 
             ref var cell = ref _cellPool.Add(entity);
             cell.Position = new Vector2Int(x, y);
+
+            _dirtyPool.Add(entity);
         }
     }
 }

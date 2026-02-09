@@ -1,5 +1,6 @@
 using Configs;
 using UnityEngine;
+using UnityEngine.UI;
 using VContainer;
 using VContainer.Unity;
 
@@ -9,6 +10,7 @@ namespace UI
     {
         [SerializeField] private RectTransform _container;
         [SerializeField] private CellView _cellTemplate;
+        [SerializeField] private GridLayoutGroup _grid;
 
         [Inject] private MineFieldConfig _config;
         [Inject] private ICellViewRegistry _registry;
@@ -28,6 +30,7 @@ namespace UI
             if (_cellTemplate == null)
                 return;
 
+            ValidateGrid();
             _registry.Clear();
 
             _cellTemplate.gameObject.SetActive(false);
@@ -45,6 +48,12 @@ namespace UI
                     _registry.Register(pos, view);
                 }
             }
+        }
+
+        private void ValidateGrid()
+        {
+            _grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+            _grid.constraintCount = _config.Columns;
         }
     }
 }

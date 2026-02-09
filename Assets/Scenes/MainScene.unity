@@ -458,6 +458,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _container: {fileID: 1205421215}
   _cellTemplate: {fileID: 2724615155130353916, guid: 15dba5e02772f4a8f8d635136a44505b, type: 3}
+  _grid: {fileID: 1205421217}
 --- !u!114 &1205421217
 MonoBehaviour:
   m_ObjectHideFlags: 0

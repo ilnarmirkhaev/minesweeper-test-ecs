@@ -20,6 +20,8 @@ namespace Core.Systems
         private readonly EcsPool<OpenCellCommand> _requestPool;
         private readonly EcsPool<Flagged> _flagPool;
 
+        private readonly Queue<int> _queue = new();
+
         public CellOpenSystem(ICellLookup lookup, EcsPool<CellComponent> cellPool, EcsPool<MineComponent> minePool,
             EcsPool<NeighborMinesCount> neighborPool, EcsPool<Opened> openedPool, EcsPool<Exploded> explodedPool,
             EcsPool<Dirty> dirtyPool, EcsPool<OpenCellCommand> requestPool, EcsPool<Flagged> flagPool)
@@ -61,12 +63,11 @@ namespace Core.Systems
 
         private void FloodFillOpen(int cellEntity)
         {
-            var queue = new Queue<int>();
-            queue.Enqueue(cellEntity);
+            _queue.Enqueue(cellEntity);
 
-            while (queue.Count > 0)
+            while (_queue.Count > 0)
             {
-                var e = queue.Dequeue();
+                var e = _queue.Dequeue();
                 if (_openedPool.Has(e) || _minePool.Has(e)) continue;
 
                 MarkCellOpened(e);
@@ -75,7 +76,7 @@ namespace Core.Systems
                 if (value != 0) continue;
 
                 ref var cell = ref _cellPool.Get(e);
-                AddNeighborCellsToFlood(cell.Position, queue);
+                AddNeighborCellsToFlood(cell.Position, _queue);
             }
         }
 

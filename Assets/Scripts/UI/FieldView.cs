@@ -39,15 +39,19 @@ namespace UI
             {
                 for (var col = 0; col < _config.Columns; col++)
                 {
-                    // TODO: move to factory?
-                    var pos = new Vector2Int(row, col);
-                    var view = _resolver.Instantiate(_cellTemplate, _container);
-                    view.gameObject.name = $"Cell_{row}_{col}";
-                    view.gameObject.SetActive(true);
-                    view.Initialize(pos);
-                    _registry.Register(pos, view);
+                    CreateCellView(row, col);
                 }
             }
+        }
+
+        private void CreateCellView(int row, int col)
+        {
+            var pos = new Vector2Int(row, col);
+            var view = _resolver.Instantiate(_cellTemplate, _container);
+            view.gameObject.name = $"Cell_{row}_{col}";
+            view.gameObject.SetActive(true);
+            view.Initialize(pos);
+            _registry.Register(pos, view);
         }
 
         private void ValidateGrid()

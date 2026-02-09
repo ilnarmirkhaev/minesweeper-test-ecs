@@ -11,4 +11,8 @@ namespace Core.Components
     public struct Exploded
     {
     }
+
+    public struct Dirty
+    {
+    }
 }

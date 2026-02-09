@@ -31,6 +31,11 @@ namespace Infrastructure
                 _systemsGroup.Add(system);
             }
 
+#if UNITY_EDITOR
+            _systemsGroup.Add(new Leopotam.EcsLite.UnityEditor.EcsWorldDebugSystem());
+            _systemsGroup.Add(new Leopotam.EcsLite.UnityEditor.EcsSystemsDebugSystem());
+#endif
+
             _systemsGroup.Init();
         }
 

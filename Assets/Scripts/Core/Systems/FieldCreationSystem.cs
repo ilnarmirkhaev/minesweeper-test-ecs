@@ -29,14 +29,12 @@ namespace Core.Systems
             }
         }
 
-        private ref CellComponent CreateCell(int x, int y)
+        private void CreateCell(int x, int y)
         {
             var entity = _world.NewEntity();
 
             ref var cell = ref _cellPool.Add(entity);
             cell.Position = new Vector2Int(x, y);
-
-            return ref cell;
         }
     }
 }

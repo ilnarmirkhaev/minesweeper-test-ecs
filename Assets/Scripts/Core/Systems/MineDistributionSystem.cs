@@ -6,12 +6,13 @@ using UnityEngine;
 
 namespace Core.Systems
 {
-    public class MineDistributionSystem : IEcsInitSystem
+    public class MineDistributionSystem : IEcsRunSystem
     {
         private readonly MineFieldConfig _config;
         private readonly EcsPool<MineComponent> _minePool;
 
         private EcsFilter _closedCellsFilter;
+        private EcsFilter _gameStartedFilter;
 
         public MineDistributionSystem(MineFieldConfig config, EcsPool<MineComponent> minePool)
         {
@@ -19,11 +20,14 @@ namespace Core.Systems
             _minePool = minePool;
         }
 
-        public void Init(IEcsSystems systems)
+        public void Run(IEcsSystems systems)
         {
-            _closedCellsFilter = systems.GetWorld().Filter<CellComponent>().Exc<Opened>().End();
+            var world = systems.GetWorld();
+            _closedCellsFilter ??= world.Filter<CellComponent>().Exc<Opened>().End();
+            _gameStartedFilter ??= world.Filter<FirstCellOpenedEvent>().End();
 
-            DistributeMines();
+            var gameStart = _gameStartedFilter.GetEntitiesCount() > 0;
+            if (gameStart) DistributeMines();
         }
 
         private void DistributeMines()

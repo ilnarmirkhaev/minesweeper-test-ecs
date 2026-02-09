@@ -55,12 +55,10 @@ namespace Core.Systems
             if (_flaggedPool.Has(cellEntity))
             {
                 _flaggedPool.Del(cellEntity);
-                _session.RemainingFlags++;
             }
-            else if (_session.RemainingFlags > 0)
+            else
             {
                 _flaggedPool.Add(cellEntity);
-                _session.RemainingFlags--;
             }
         }
 

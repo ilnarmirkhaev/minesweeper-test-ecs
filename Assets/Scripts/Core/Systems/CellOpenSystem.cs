@@ -9,7 +9,6 @@ namespace Core.Systems
 {
     public sealed class CellOpenSystem : IEcsRunSystem
     {
-        private readonly EcsWorld _world;
         private readonly ICellLookup _lookup;
         private readonly GameSessionState _session;
 
@@ -21,14 +20,12 @@ namespace Core.Systems
         private readonly EcsPool<Exploded> _explodedPool;
         private readonly EcsPool<Dirty> _dirtyPool;
         private readonly EcsPool<OpenCellRequest> _requestPool;
-        private readonly EcsPool<FirstCellOpenedEvent> _firstCellPool;
 
-        public CellOpenSystem(EcsWorld world, ICellLookup lookup, GameSessionState session,
-            EcsPool<CellComponent> cellPool, EcsPool<MineComponent> minePool, EcsPool<NeighborMinesCount> neighborPool,
-            EcsPool<Opened> openedPool, EcsPool<Flagged> flaggedPool, EcsPool<Exploded> explodedPool,
-            EcsPool<Dirty> dirtyPool, EcsPool<OpenCellRequest> requestPool, EcsPool<FirstCellOpenedEvent> firstCellPool)
+        public CellOpenSystem(ICellLookup lookup, GameSessionState session, EcsPool<CellComponent> cellPool,
+            EcsPool<MineComponent> minePool, EcsPool<NeighborMinesCount> neighborPool, EcsPool<Opened> openedPool,
+            EcsPool<Flagged> flaggedPool, EcsPool<Exploded> explodedPool, EcsPool<Dirty> dirtyPool,
+            EcsPool<OpenCellRequest> requestPool)
         {
-            _world = world;
             _lookup = lookup;
             _session = session;
             _cellPool = cellPool;
@@ -39,7 +36,6 @@ namespace Core.Systems
             _explodedPool = explodedPool;
             _dirtyPool = dirtyPool;
             _requestPool = requestPool;
-            _firstCellPool = firstCellPool;
         }
 
         public void Run(IEcsSystems systems)
@@ -67,26 +63,13 @@ namespace Core.Systems
                 return;
 
             OpenCell(cellEntity);
-
-            if (!_session.GameStarted)
-            {
-                _session.GameStarted = true;
-                _firstCellPool.Add(_world.NewEntity());
-            }
         }
 
         private void OpenCell(int cellEntity)
         {
-            if (!_session.GameStarted)
-            {
-                MarkCellOpened(cellEntity);
-                return;
-            }
-
             if (_minePool.Has(cellEntity))
             {
-                _explodedPool.Add(cellEntity);
-                MarkDirty(cellEntity);
+                MarkCellExploded(cellEntity);
                 return;
             }
 
@@ -136,6 +119,12 @@ namespace Core.Systems
         {
             if (_openedPool.Has(entity)) return;
             _openedPool.Add(entity);
+            MarkDirty(entity);
+        }
+
+        private void MarkCellExploded(int entity)
+        {
+            _explodedPool.Add(entity);
             MarkDirty(entity);
         }
 

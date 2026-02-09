@@ -37,8 +37,6 @@ namespace Infrastructure
         private void RegisterSystems(IContainerBuilder builder)
         {
             // input systems
-            builder.RegisterSystem<CellOpenSystem>();
-            builder.RegisterSystem<CellFlagSystem>();
             builder.RegisterSystem<RestartInputSystem>();
 
             // init systems
@@ -50,6 +48,8 @@ namespace Infrastructure
             builder.RegisterSystem<GameStartCleanupSystem>();
 
             // game loop systems
+            builder.RegisterSystem<CellOpenSystem>();
+            builder.RegisterSystem<CellFlagSystem>();
             builder.RegisterSystem<WinCheckSystem>();
             builder.RegisterSystem<CellViewDrawSystem>();
         }
@@ -65,7 +65,7 @@ namespace Infrastructure
             builder.RegisterPool<Exploded>();
             builder.RegisterPool<Dirty>();
 
-            builder.RegisterPool<FirstCellOpenedEvent>();
+            builder.RegisterPool<FirstCellClickedEvent>();
             builder.RegisterPool<OpenCellRequest>();
             builder.RegisterPool<ToggleFlagRequest>();
             builder.RegisterPool<RestartRequest>();

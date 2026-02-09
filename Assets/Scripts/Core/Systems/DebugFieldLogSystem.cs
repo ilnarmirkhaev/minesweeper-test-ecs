@@ -28,7 +28,7 @@ namespace Core.Systems
 
         public void Run(IEcsSystems systems)
         {
-            _filter ??= systems.GetWorld().Filter<FirstCellOpenedEvent>().End();
+            _filter ??= systems.GetWorld().Filter<FirstCellClickedEvent>().End();
 
             if (_filter.GetEntitiesCount() <= 0) return;
 

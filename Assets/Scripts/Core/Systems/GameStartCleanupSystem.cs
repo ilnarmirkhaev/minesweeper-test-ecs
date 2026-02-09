@@ -3,7 +3,7 @@ using Leopotam.EcsLite;
 
 namespace Core.Systems
 {
-    public sealed class GameStartSystem : IEcsRunSystem
+    public sealed class GameStartCleanupSystem : IEcsRunSystem
     {
         private EcsFilter _gameStartFilter;
 

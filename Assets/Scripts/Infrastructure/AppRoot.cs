@@ -36,16 +36,20 @@ namespace Infrastructure
 
         private void RegisterSystems(IContainerBuilder builder)
         {
-            builder.RegisterSystem<FieldCreationSystem>();
-            builder.RegisterSystem<SessionResetSystem>();
+            // input systems
             builder.RegisterSystem<CellOpenSystem>();
             builder.RegisterSystem<CellFlagSystem>();
+            builder.RegisterSystem<RestartInputSystem>();
+
+            // init systems
+            builder.RegisterSystem<FieldCreationSystem>();
+            builder.RegisterSystem<GameResetSystem>();
             builder.RegisterSystem<MineDistributionSystem>();
             builder.RegisterSystem<NeighborMinesCountSystem>();
             builder.RegisterSystem<DebugFieldLogSystem>();
-            builder.RegisterSystem<GameStartSystem>();
-            builder.RegisterSystem<RestartInputSystem>();
-            builder.RegisterSystem<RestartSystem>();
+            builder.RegisterSystem<GameStartCleanupSystem>();
+
+            // game loop systems
             builder.RegisterSystem<WinCheckSystem>();
             builder.RegisterSystem<CellViewDrawSystem>();
         }
@@ -65,7 +69,8 @@ namespace Infrastructure
             builder.RegisterPool<OpenCellRequest>();
             builder.RegisterPool<ToggleFlagRequest>();
             builder.RegisterPool<RestartRequest>();
-            builder.RegisterPool<GameOverEvent>();
+            builder.RegisterPool<GameResetListenerBind>();
+            builder.RegisterPool<GameOverListenerBind>();
         }
     }
 }

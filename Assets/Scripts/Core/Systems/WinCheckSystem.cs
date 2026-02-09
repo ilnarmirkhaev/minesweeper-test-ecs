@@ -9,32 +9,31 @@ namespace Core.Systems
     public sealed class WinCheckSystem : IEcsRunSystem
     {
         private readonly MineFieldConfig _config;
-        private readonly EcsPool<GameOverEvent> _gameOverPool;
         private readonly GameSessionState _session;
+        private readonly EcsWorld _world;
 
         private EcsFilter _openedFilter;
         private EcsFilter _explodedFilter;
+        private EcsFilter _listenersFilter;
 
-        public WinCheckSystem(MineFieldConfig config, EcsPool<GameOverEvent> gameOverPool, GameSessionState session)
+        public WinCheckSystem(MineFieldConfig config, GameSessionState session, EcsWorld world)
         {
             _config = config;
-            _gameOverPool = gameOverPool;
             _session = session;
+            _world = world;
         }
 
         public void Run(IEcsSystems systems)
         {
             if (_session.IsGameOver || !_session.GameStarted) return;
 
-            var world = systems.GetWorld();
-
-            _openedFilter ??= world.Filter<CellComponent>().Inc<Opened>().End();
-            _explodedFilter ??= world.Filter<CellComponent>().Inc<Exploded>().End();
+            _openedFilter ??= _world.Filter<CellComponent>().Inc<Opened>().End();
+            _explodedFilter ??= _world.Filter<CellComponent>().Inc<Exploded>().End();
 
             var isExploded = _explodedFilter.GetEntitiesCount() > 0;
             if (isExploded)
             {
-                GameOver(false, world);
+                Lose();
                 return;
             }
 
@@ -44,18 +43,24 @@ namespace Core.Systems
 
             if (openedSafe >= totalSafe)
             {
-                GameOver(true, world);
+                Win();
             }
         }
 
-        private void GameOver(bool win, EcsWorld world)
+        private void Win() => GameOver(true);
+        private void Lose() => GameOver(false);
+
+        private void GameOver(bool win)
         {
             _session.IsGameOver = true;
             _session.IsWin = win;
 
-            var evtEntity = world.NewEntity();
-            ref var evt = ref _gameOverPool.Add(evtEntity);
-            evt.IsWin = win;
+            var pool = _world.GetPool<GameOverListenerBind>();
+            _listenersFilter ??= _world.Filter<GameOverListenerBind>().End();
+            foreach (var e in _listenersFilter)
+            {
+                pool.Get(e).Listener.GameOver(win);
+            }
 
             var result = win ? "Win" : "Lose";
             Debug.Log($"Game Over: {result}");

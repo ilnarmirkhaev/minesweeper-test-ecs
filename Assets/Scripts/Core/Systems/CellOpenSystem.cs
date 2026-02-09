@@ -21,14 +21,12 @@ namespace Core.Systems
         private readonly EcsPool<Exploded> _explodedPool;
         private readonly EcsPool<Dirty> _dirtyPool;
         private readonly EcsPool<OpenCellRequest> _requestPool;
-        private readonly EcsPool<GameOverEvent> _gameOverPool;
         private readonly EcsPool<FirstCellOpenedEvent> _firstCellPool;
 
         public CellOpenSystem(EcsWorld world, ICellLookup lookup, GameSessionState session,
             EcsPool<CellComponent> cellPool, EcsPool<MineComponent> minePool, EcsPool<NeighborMinesCount> neighborPool,
             EcsPool<Opened> openedPool, EcsPool<Flagged> flaggedPool, EcsPool<Exploded> explodedPool,
-            EcsPool<Dirty> dirtyPool, EcsPool<OpenCellRequest> requestPool, EcsPool<GameOverEvent> gameOverPool,
-            EcsPool<FirstCellOpenedEvent> firstCellPool)
+            EcsPool<Dirty> dirtyPool, EcsPool<OpenCellRequest> requestPool, EcsPool<FirstCellOpenedEvent> firstCellPool)
         {
             _world = world;
             _lookup = lookup;
@@ -41,7 +39,6 @@ namespace Core.Systems
             _explodedPool = explodedPool;
             _dirtyPool = dirtyPool;
             _requestPool = requestPool;
-            _gameOverPool = gameOverPool;
             _firstCellPool = firstCellPool;
         }
 
@@ -115,23 +112,29 @@ namespace Core.Systems
                 if (value != 0) continue;
 
                 ref var cell = ref _cellPool.Get(e);
-                foreach (var offset in Constants.NeighborOffsets)
-                {
-                    var pos = cell.Position + offset;
-                    if (!_lookup.TryGetCellEntity(pos, out var neighborEntity))
-                        continue;
-                    if (_openedPool.Has(neighborEntity) || _flaggedPool.Has(neighborEntity))
-                        continue;
-                    if (_minePool.Has(neighborEntity))
-                        continue;
+                AddNeighborCellsToFlood(cell.Position, queue);
+            }
+        }
 
-                    queue.Enqueue(neighborEntity);
-                }
+        private void AddNeighborCellsToFlood(Vector2Int cellPosition, Queue<int> queue)
+        {
+            foreach (var offset in Constants.NeighborOffsets)
+            {
+                var pos = cellPosition + offset;
+                if (!_lookup.TryGetCellEntity(pos, out var neighborEntity))
+                    continue;
+                if (_openedPool.Has(neighborEntity) || _flaggedPool.Has(neighborEntity))
+                    continue;
+                if (_minePool.Has(neighborEntity))
+                    continue;
+
+                queue.Enqueue(neighborEntity);
             }
         }
 
         private void MarkCellOpened(int entity)
         {
+            if (_openedPool.Has(entity)) return;
             _openedPool.Add(entity);
             MarkDirty(entity);
         }

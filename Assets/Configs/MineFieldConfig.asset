@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <Rows>k__BackingField: 16
   <Columns>k__BackingField: 30
-  <MinesCount>k__BackingField: 99
+  <MinesCount>k__BackingField: 50

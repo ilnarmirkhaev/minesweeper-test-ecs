@@ -37,9 +37,10 @@ namespace Core.Systems
                 return;
             }
 
+            const int minSafeCells = 1;
             var openedSafe = _openedFilter.GetEntitiesCount();
             var totalSafe = _config.TotalCells - _config.MinesCount;
-            totalSafe = Mathf.Max(1, totalSafe);
+            totalSafe = Mathf.Max(minSafeCells, totalSafe);
 
             if (openedSafe >= totalSafe)
             {

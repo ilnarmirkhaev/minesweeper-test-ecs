@@ -1,6 +1,7 @@
 # Minesweeper Test Task
 
-Клон игры "Сапёр", реализованный на Unity с использованием архитектурных паттернов ECS (LeoECSLite) и Dependency Injection (VContainer).
+Клон игры "Сапёр", реализованный на Unity с использованием архитектурных паттернов ECS (**LeoECSLite**) и Dependency Injection (**VContainer**).\
+Версия Unity - 2022.3.62f2
 
 ## Как играть
 

@@ -37,6 +37,7 @@ namespace Infrastructure
         private void RegisterSystems(IContainerBuilder builder)
         {
             builder.RegisterSystem<FieldCreationSystem>();
+            builder.RegisterSystem<SessionResetSystem>();
             builder.RegisterSystem<CellOpenSystem>();
             builder.RegisterSystem<CellFlagSystem>();
             builder.RegisterSystem<MineDistributionSystem>();

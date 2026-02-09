@@ -24,7 +24,7 @@ namespace Core.Services
             GameStarted = false;
             IsGameOver = false;
             IsWin = false;
-            RemainingFlags = _config != null ? _config.MinesCount : 0;
+            RemainingFlags = _config ? _config.MinesCount : 0;
         }
     }
 }

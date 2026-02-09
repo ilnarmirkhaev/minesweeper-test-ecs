@@ -21,6 +21,7 @@ namespace Core.Systems
         private readonly EcsPool<Flagged> _flagPool;
 
         private readonly Queue<int> _queue = new();
+        private readonly HashSet<int> _visited = new();
 
         private EcsFilter _commandFilter;
 
@@ -66,6 +67,8 @@ namespace Core.Systems
         private void FloodFillOpen(int cellEntity)
         {
             _queue.Enqueue(cellEntity);
+            _visited.Clear();
+            _visited.Add(cellEntity);
 
             while (_queue.Count > 0)
             {
@@ -90,7 +93,9 @@ namespace Core.Systems
                 if (!_lookup.TryGetCellEntity(pos, out var neighborEntity))
                     continue;
                 if (_openedPool.Has(neighborEntity) || _minePool.Has(neighborEntity)) continue;
+                if (_visited.Contains(neighborEntity)) continue;
 
+                _visited.Add(neighborEntity);
                 queue.Enqueue(neighborEntity);
             }
         }
